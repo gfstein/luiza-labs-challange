@@ -1,6 +1,7 @@
 package com.example.backend.application.user;
 
 import com.example.backend.application.product.ProductServiceRepository;
+import com.example.backend.application.user.mapper.UserMapper;
 import com.example.backend.domain.Product;
 import com.example.backend.domain.User;
 import com.example.backend.exceptions.DomainException;
@@ -20,11 +21,13 @@ public class UserService {
     private final UserServiceRepository repository;
     private final ProductServiceRepository productRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
 //    CRUD operations for User
@@ -45,9 +48,9 @@ public class UserService {
 
     public User updatePersonalData(UUID id, UserUpdateDto dto) {
         User user = repository.getUser(id).orElseThrow();
-        dto.name().ifPresent(user::setName);
-        dto.email().ifPresent(user::setEmail);
-        dto.password().ifPresent(user::setPassword);
+
+        user = userMapper.map(dto, user);
+
         return repository.updatePersonalData(user);
     }
 
