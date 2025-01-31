@@ -4,13 +4,13 @@ import com.example.backend.application.product.ProductServiceRepository;
 import com.example.backend.application.user.mapper.UserMapper;
 import com.example.backend.domain.Product;
 import com.example.backend.domain.User;
+import com.example.backend.domain.encoder.UserPasswordEncoder;
 import com.example.backend.exceptions.DomainException;
 import com.example.backend.exceptions.DuplicateException;
 import com.example.backend.infra.controller.auth.dto.SignupRequest;
 import com.example.backend.infra.controller.user.dto.UserUpdateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,11 +24,11 @@ public class UserService {
 
     private final UserServiceRepository repository;
     private final ProductServiceRepository productRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserPasswordEncoder passwordEncoder;
     private final ProductDataProvider productDataProvider;
     private final UserMapper userMapper;
 
-    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, PasswordEncoder passwordEncoder, ProductDataProvider productDataProvider, UserMapper userMapper) {
+    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, UserPasswordEncoder passwordEncoder, ProductDataProvider productDataProvider, UserMapper userMapper) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
@@ -44,9 +44,9 @@ public class UserService {
             logger.warn("User with email {} already exists", u.getEmail());
             throw new DuplicateException("User with email " + u.getEmail() + " already exists");
         });
-        String hashedPassword = passwordEncoder.encode(userDto.password());
-        User user = User.create(userDto.name(), userDto.email(), hashedPassword);
-        user.setPassword(hashedPassword);
+
+        User user = User.create(userDto.name(), userDto.email(), userDto.password(), passwordEncoder);
+
         logger.info("User created successfully with email: {}", user.getEmail());
         return repository.saveUser(user);
     }
@@ -88,7 +88,7 @@ public class UserService {
             throw new DomainException("User not found");
         });
 
-        if(!productDataProvider.validateProduct(productDB.getId())) {
+        if (!productDataProvider.validateProduct(productDB.getId())) {
             logger.error("Product with id {} is not valid", product.getId());
             throw new DomainException("Product is not valid");
         }

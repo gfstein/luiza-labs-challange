@@ -1,5 +1,6 @@
 package com.example.backend.domain;
 
+import com.example.backend.domain.encoder.UserPasswordEncoder;
 import com.example.backend.exceptions.DomainException;
 import com.example.backend.util.Validator;
 import lombok.Getter;
@@ -22,15 +23,23 @@ public class User {
     }
 
     public static User create(String name, String email, String password) {
-        return create(UUID.randomUUID(), name, email, password);
+        return create(UUID.randomUUID(), name, email, password, null);
     }
 
-    public static User create(UUID id, String name, String email, String password) {
+    public static User create(String name, String email, String password, UserPasswordEncoder passwordEncoder) {
+        return create(UUID.randomUUID(), name, email, password, passwordEncoder);
+    }
+
+    public static User create(UUID id, String email, String name, String password) {
+        return create(id, name, email, password, null);
+    }
+
+    public static User create(UUID id, String name, String email, String password, UserPasswordEncoder passwordEncoder) {
         User user = new User();
         user.setId(id);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(password, passwordEncoder);
 
         return user;
     }
@@ -105,12 +114,21 @@ public class User {
     }
 
     public void setPassword(String password) {
+        setPassword(password, null);
+    }
 
-        if (!Validator.isValidPassword(password)) {
-            throw new DomainException("Password not strong enough");
+    public void setPassword(String password, UserPasswordEncoder passwordEncoder) {
+
+        if (passwordEncoder != null) {
+
+            if (!Validator.isValidPassword(password)) {
+                throw new DomainException("Password not strong enough");
+            }
+            this.password = passwordEncoder.encode(password);
+
+        } else {
+            this.password = password;
         }
-
-        this.password = password;
     }
 
     public void setProducts(Set<Product> products) {

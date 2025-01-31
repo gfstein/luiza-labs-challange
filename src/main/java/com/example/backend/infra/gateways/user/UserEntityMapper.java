@@ -20,7 +20,7 @@ public class UserEntityMapper {
     }
 
     public User toDomain(UserEntity userEntity) {
-        User user = User.create(userEntity.getId(), userEntity.getName(), userEntity.getEmail(), userEntity.getPassword());
+        User user = User.create(userEntity.getId(), userEntity.getEmail(), userEntity.getName(), userEntity.getPassword());
         user.addFavoriteList(
                 userEntity.getProducts()
                         .stream()

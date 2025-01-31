@@ -36,8 +36,7 @@ public class ExternalProductDataProvider implements ProductDataProvider {
             ResponseEntity<ExternalProductDto[]> response = restTemplate.getForEntity(productsApiUrl, ExternalProductDto[].class);
 
             if (Objects.isNull(response.getBody())) {
-                log.error("No product data found from external API.");
-                throw new NotFoundException("No product data found from external API.");
+                log.error("No product data found from external API {}: {}", productsApiUrl, response.getStatusCode());
             }
 
             List<ExternalProductDto> products = Arrays.asList(response.getBody());
