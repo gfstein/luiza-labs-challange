@@ -18,7 +18,8 @@ public class User {
     private String password;
     private final Set<Product> products = new HashSet<>();
 
-    private User () {}
+    private User() {
+    }
 
     public static User create(String name, String email, String password) {
         return create(UUID.randomUUID(), name, email, password);

@@ -25,12 +25,14 @@ public class UserService {
     private final UserServiceRepository repository;
     private final ProductServiceRepository productRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProductDataProvider productDataProvider;
     private final UserMapper userMapper;
 
-    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserService(UserServiceRepository repository, ProductServiceRepository productRepository, PasswordEncoder passwordEncoder, ProductDataProvider productDataProvider, UserMapper userMapper) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
+        this.productDataProvider = productDataProvider;
         this.userMapper = userMapper;
     }
 
@@ -85,6 +87,12 @@ public class UserService {
             logger.error("User with email {} not found", email);
             throw new DomainException("User not found");
         });
+
+        if(!productDataProvider.validateProduct(productDB.getId())) {
+            logger.error("Product with id {} is not valid", product.getId());
+            throw new DomainException("Product is not valid");
+        }
+
         user.addFavoriteProduct(productDB);
         repository.saveUser(user);
         logger.info("Favorite product added successfully for user with email: {}", email);
