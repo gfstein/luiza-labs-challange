@@ -10,7 +10,9 @@ export const SWRProvider = ({ children }: SWRProviderProps) => {
 
   const fetcher = async (url: string) => {
 
-    const res = await fetch('/api/apim' + url)
+    const uri = url.startsWith('/') ? '/api/apim' + url : url;
+
+    const res = await fetch(uri)
 
     if (!res.ok) {
       throw await res.json()

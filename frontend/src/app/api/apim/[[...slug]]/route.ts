@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const res = await fetch(getUri(req.nextUrl), await getRequestOptions(req, 'PUT'));
+    const res = await fetch(getUri(req.nextUrl), await getRequestOptions(req, 'PUT', await req.json()));
     return NextResponse.json(await res.json(), {status: res.status});
   } catch (e) {
     return handleErrors(e as ResponseError);
@@ -32,7 +32,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const res = await fetch(getUri(req.nextUrl), await getRequestOptions(req, 'POST'));
+    const res = await fetch(getUri(req.nextUrl), await getRequestOptions(req, 'POST', await req.json()));
     return NextResponse.json(await res.json(), {status: res.status});
   } catch (e) {
     return handleErrors(e as ResponseError);
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const res = await fetch(getUri(req.nextUrl), await getRequestOptions(req, 'DELETE'));
-    return NextResponse.json(await res.json(), {status: res.status});
+    return NextResponse.json({}, {status: res.status});
   } catch (e) {
     return handleErrors(e as ResponseError);
   }
@@ -58,8 +58,9 @@ const getUri = (url: NextURL) => {
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-const getRequestOptions = async (req: NextRequest, method: Method, body?: never) => {
+const getRequestOptions = async (req: NextRequest, method: Method, body?: object) => {
   const token = await getToken({req, secret: process.env.JWT_SECRET});
+
   return {
     method,
     headers: {

@@ -1,7 +1,10 @@
+import ShowCase from "@/components/ShowCase";
+
 export default function Home() {
 
   return (
-
-    <h1>Home</h1>
+    <div>
+      <ShowCase/>
+    </div>
   );
 }

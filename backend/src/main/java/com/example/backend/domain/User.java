@@ -44,7 +44,7 @@ public class User {
         }
 
         if (products.size() >= 5) {
-            throw new DomainException("Favorite products limit reached");
+            throw new DomainException("Não pode ter mais de 5 favoritos!");
         }
 
         products.add(product);

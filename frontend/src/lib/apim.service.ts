@@ -17,7 +17,10 @@ class ApimService {
   }
 
   private handleFetch = async (url: string, method?: string, body?: object) => {
-    const res = await fetch('/api/apim' + url, {
+
+    const uri = url.startsWith('/') ? '/api/apim' + url : url;
+
+    const res = await fetch(uri, {
       method: method || 'GET',
       body: JSON.stringify(body)
     })
